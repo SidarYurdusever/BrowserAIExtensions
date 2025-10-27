@@ -1,7 +1,7 @@
 // Content script - Runs on web pages
-console.log('AI Metin Asistanı content script yüklendi');
+console.log('Metin Yardımcısı content script yüklendi');
 
-let aiModal = null;
+let helperModal = null;
 let floatingButton = null;
 let selectedText = '';
 
@@ -10,7 +10,7 @@ function createFloatingButton() {
   if (floatingButton) return floatingButton;
   
   const button = document.createElement('div');
-  button.id = 'ai-floating-button';
+  button.id = 'tx-floating-button';
   button.innerHTML = `
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -56,11 +56,11 @@ function createFloatingButton() {
 // Floating menu oluştur
 function showFloatingMenu(x, y) {
   // Önceki menu varsa kaldır
-  const existingMenu = document.getElementById('ai-floating-menu');
+  const existingMenu = document.getElementById('tx-floating-menu');
   if (existingMenu) existingMenu.remove();
   
   const menu = document.createElement('div');
-  menu.id = 'ai-floating-menu';
+  menu.id = 'tx-floating-menu';
   menu.style.cssText = `
     position: absolute;
     left: ${x}px;
@@ -106,7 +106,7 @@ function showFloatingMenu(x, y) {
     });
     
     menuItem.addEventListener('click', () => {
-      processTextWithAI(item.id, selectedText);
+      processTextRequest(item.id, selectedText);
       menu.remove();
       hideFloatingButton();
     });
@@ -141,14 +141,14 @@ function hideFloatingButton() {
   if (floatingButton) {
     floatingButton.style.display = 'none';
   }
-  const menu = document.getElementById('ai-floating-menu');
+  const menu = document.getElementById('tx-floating-menu');
   if (menu) menu.remove();
 }
 
 // Metin seçimi dinle
 document.addEventListener('mouseup', (e) => {
   // Eğer floating button veya menu'ye tıklanmışsa işlem yapma
-  if (e.target.closest('#ai-floating-button') || e.target.closest('#ai-floating-menu')) {
+  if (e.target.closest('#tx-floating-button') || e.target.closest('#tx-floating-menu')) {
     return;
   }
   
@@ -166,7 +166,7 @@ document.addEventListener('mouseup', (e) => {
       );
     } else {
       // Modal açıkken butonu gizleme
-      if (!document.getElementById('ai-assistant-modal') || document.getElementById('ai-assistant-modal').style.display === 'none') {
+      if (!document.getElementById('tx-helper-modal') || document.getElementById('tx-helper-modal').style.display === 'none') {
         hideFloatingButton();
       }
     }
@@ -176,14 +176,14 @@ document.addEventListener('mouseup', (e) => {
 // Seçim kaldırıldığında butonu gizle (menu açıkken gizleme)
 document.addEventListener('selectionchange', () => {
   const selection = window.getSelection();
-  const menu = document.getElementById('ai-floating-menu');
-  const modal = document.getElementById('ai-assistant-modal');
+  const menu = document.getElementById('tx-floating-menu');
+  const modal = document.getElementById('tx-helper-modal');
   
   if (selection.toString().trim().length === 0 && !menu && (!modal || modal.style.display === 'none')) {
     setTimeout(() => {
       const currentSelection = window.getSelection();
-      const currentMenu = document.getElementById('ai-floating-menu');
-      const currentModal = document.getElementById('ai-assistant-modal');
+      const currentMenu = document.getElementById('tx-floating-menu');
+      const currentModal = document.getElementById('tx-helper-modal');
       
       if (currentSelection.toString().trim().length === 0 && !currentMenu && (!currentModal || currentModal.style.display === 'none')) {
         hideFloatingButton();
@@ -192,19 +192,19 @@ document.addEventListener('selectionchange', () => {
   }
 });
 
-// AI işleme fonksiyonu
+// Metni işleme fonksiyonu
 let currentOperation = null;
 let currentSourceText = null;
 let currentResult = null;
 
-function processTextWithAI(operation, text, targetLanguage = null) {
-  console.log('AI işlemi başlatılıyor:', operation);
+function processTextRequest(operation, text, targetLanguage = null) {
+  console.log('İşlem başlatılıyor:', operation);
   currentOperation = operation;
   currentSourceText = text;
   showModal('loading');
   
   chrome.runtime.sendMessage({
-    action: 'processWithAI',
+    action: 'processTextRequest',
     operation: operation,
     text: text,
     targetLanguage: targetLanguage
@@ -220,10 +220,10 @@ function processTextWithAI(operation, text, targetLanguage = null) {
 
 // Modal oluştur
 function createModal() {
-  if (aiModal) return aiModal;
+  if (helperModal) return helperModal;
   
   const modal = document.createElement('div');
-  modal.id = 'ai-assistant-modal';
+  modal.id = 'tx-helper-modal';
   modal.style.cssText = `
     position: fixed;
     top: 50%;
@@ -244,7 +244,7 @@ function createModal() {
   `;
   
   modal.innerHTML = `
-    <div id="ai-modal-header" style="
+    <div id="tx-modal-header" style="
       padding: 16px 20px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       border-radius: 12px 12px 0 0;
@@ -255,9 +255,9 @@ function createModal() {
       user-select: none;
       gap: 12px;
     ">
-      <h3 style="margin: 0; color: white; font-size: 16px; flex: 1;">AI Metin Asistanı - Sonuç</h3>
-      <div id="ai-language-selector-header" style="display: none; position: relative;">
-        <button id="ai-lang-toggle" style="
+      <h3 style="margin: 0; color: white; font-size: 16px; flex: 1;">Metin Yardımcısı - Sonuç</h3>
+      <div id="tx-language-selector-header" style="display: none; position: relative;">
+        <button id="tx-lang-toggle" style="
           padding: 6px 10px;
           background: rgba(255,255,255,0.2);
           color: white;
@@ -271,15 +271,15 @@ function createModal() {
           transition: all 0.2s ease;
           white-space: nowrap;
         ">
-          <span id="ai-current-lang" style="display: flex; align-items: center; gap: 4px;">
-            <span id="ai-lang-flag" style="font-size: 14px;">🇹🇷</span>
-            <span id="ai-lang-name" style="font-size: 12px;">Türkçe</span>
+          <span id="tx-current-lang" style="display: flex; align-items: center; gap: 4px;">
+            <span id="tx-lang-flag" style="font-size: 14px;">🇹🇷</span>
+            <span id="tx-lang-name" style="font-size: 12px;">Türkçe</span>
           </span>
-          <svg id="ai-lang-arrow" width="12" height="12" viewBox="0 0 16 16" style="transition: transform 0.3s ease;">
+          <svg id="tx-lang-arrow" width="12" height="12" viewBox="0 0 16 16" style="transition: transform 0.3s ease;">
             <path d="M4 6l4 4 4-4" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
-        <div id="ai-lang-dropdown" style="
+        <div id="tx-lang-dropdown" style="
           position: absolute;
           top: calc(100% + 6px);
           right: 0;
@@ -294,7 +294,7 @@ function createModal() {
           z-index: 1000;
         ">
           <div style="padding: 6px; min-width: 180px;">
-            <button class="ai-lang-option" data-lang="tr" data-flag="🇹🇷" data-name="Türkçe" style="
+            <button class="tx-lang-option" data-lang="tr" data-flag="🇹🇷" data-name="Türkçe" style="
               width: 100%;
               padding: 8px 10px;
               background: transparent;
@@ -308,7 +308,7 @@ function createModal() {
               transition: all 0.2s;
               color: #333;
             "><span>🇹🇷</span> Türkçe</button>
-            <button class="ai-lang-option" data-lang="en" data-flag="🇬🇧" data-name="İngilizce" style="
+            <button class="tx-lang-option" data-lang="en" data-flag="🇬🇧" data-name="İngilizce" style="
               width: 100%;
               padding: 8px 10px;
               background: transparent;
@@ -322,7 +322,7 @@ function createModal() {
               transition: all 0.2s;
               color: #333;
             "><span>🇬🇧</span> İngilizce</button>
-            <button class="ai-lang-option" data-lang="es" data-flag="🇪🇸" data-name="İspanyolca" style="
+            <button class="tx-lang-option" data-lang="es" data-flag="🇪🇸" data-name="İspanyolca" style="
               width: 100%;
               padding: 8px 10px;
               background: transparent;
@@ -336,7 +336,7 @@ function createModal() {
               transition: all 0.2s;
               color: #333;
             "><span>🇪🇸</span> İspanyolca</button>
-            <button class="ai-lang-option" data-lang="fr" data-flag="🇫🇷" data-name="Fransızca" style="
+            <button class="tx-lang-option" data-lang="fr" data-flag="🇫🇷" data-name="Fransızca" style="
               width: 100%;
               padding: 8px 10px;
               background: transparent;
@@ -350,7 +350,7 @@ function createModal() {
               transition: all 0.2s;
               color: #333;
             "><span>🇫🇷</span> Fransızca</button>
-            <button class="ai-lang-option" data-lang="de" data-flag="🇩🇪" data-name="Almanca" style="
+            <button class="tx-lang-option" data-lang="de" data-flag="🇩🇪" data-name="Almanca" style="
               width: 100%;
               padding: 8px 10px;
               background: transparent;
@@ -364,7 +364,7 @@ function createModal() {
               transition: all 0.2s;
               color: #333;
             "><span>🇩🇪</span> Almanca</button>
-            <button class="ai-lang-option" data-lang="it" data-flag="🇮🇹" data-name="İtalyanca" style="
+            <button class="tx-lang-option" data-lang="it" data-flag="🇮🇹" data-name="İtalyanca" style="
               width: 100%;
               padding: 8px 10px;
               background: transparent;
@@ -378,7 +378,7 @@ function createModal() {
               transition: all 0.2s;
               color: #333;
             "><span>🇮🇹</span> İtalyanca</button>
-            <button class="ai-lang-option" data-lang="pt" data-flag="🇵🇹" data-name="Portekizce" style="
+            <button class="tx-lang-option" data-lang="pt" data-flag="🇵🇹" data-name="Portekizce" style="
               width: 100%;
               padding: 8px 10px;
               background: transparent;
@@ -392,7 +392,7 @@ function createModal() {
               transition: all 0.2s;
               color: #333;
             "><span>🇵🇹</span> Portekizce</button>
-            <button class="ai-lang-option" data-lang="ru" data-flag="🇷🇺" data-name="Rusça" style="
+            <button class="tx-lang-option" data-lang="ru" data-flag="🇷🇺" data-name="Rusça" style="
               width: 100%;
               padding: 8px 10px;
               background: transparent;
@@ -406,7 +406,7 @@ function createModal() {
               transition: all 0.2s;
               color: #333;
             "><span>🇷🇺</span> Rusça</button>
-            <button class="ai-lang-option" data-lang="ku" data-flag="🟥" data-name="Kürtçe" style="
+            <button class="tx-lang-option" data-lang="ku" data-flag="🟥" data-name="Kürtçe" style="
               width: 100%;
               padding: 8px 10px;
               background: transparent;
@@ -420,7 +420,7 @@ function createModal() {
               transition: all 0.2s;
               color: #333;
             "><span>🟥</span> Kürtçe</button>
-            <button class="ai-lang-option" data-lang="zza" data-flag="🟨" data-name="Zazaca" style="
+            <button class="tx-lang-option" data-lang="zza" data-flag="🟨" data-name="Zazaca" style="
               width: 100%;
               padding: 8px 10px;
               background: transparent;
@@ -437,7 +437,7 @@ function createModal() {
           </div>
         </div>
       </div>
-      <button id="ai-modal-close" style="
+      <button id="tx-modal-close" style="
         background: rgba(255,255,255,0.2);
         border: none;
         font-size: 24px;
@@ -454,7 +454,7 @@ function createModal() {
       ">×</button>
     </div>
     <div style="padding: 20px;">
-      <div id="ai-modal-loading" style="text-align: center; padding: 20px; display: none;">
+      <div id="tx-modal-loading" style="text-align: center; padding: 20px; display: none;">
         <div style="
           border: 3px solid #f3f3f3;
           border-top: 3px solid #3498db;
@@ -464,9 +464,9 @@ function createModal() {
           animation: spin 1s linear infinite;
           margin: 0 auto;
         "></div>
-        <p style="margin-top: 10px; color: #666;">AI işliyor...</p>
+        <p style="margin-top: 10px; color: #666;">İşleniyor...</p>
       </div>
-      <div id="ai-modal-content" style="
+      <div id="tx-modal-content" style="
         white-space: pre-wrap;
         padding: 15px;
         background: #f5f5f5;
@@ -477,15 +477,15 @@ function createModal() {
         overflow-y: auto;
         display: none;
       "></div>
-      <div id="ai-modal-error" style="
+      <div id="tx-modal-error" style="
         padding: 15px;
         background: #fee;
         border-radius: 8px;
         color: #c33;
         display: none;
       "></div>
-      <div id="ai-modal-buttons" style="margin-top: 15px; display: none; gap: 10px;">
-        <button id="ai-copy-btn" style="
+      <div id="tx-modal-buttons" style="margin-top: 15px; display: none; gap: 10px;">
+        <button id="tx-copy-btn" style="
           padding: 8px 16px;
           background: #3498db;
           color: white;
@@ -511,7 +511,7 @@ function createModal() {
   document.body.appendChild(modal);
   
   // Modal sürükleme fonksiyonelliği
-  const header = modal.querySelector('#ai-modal-header');
+  const header = modal.querySelector('#tx-modal-header');
   let isDragging = false;
   let currentX;
   let currentY;
@@ -521,7 +521,7 @@ function createModal() {
   let yOffset = 0;
 
   header.addEventListener('mousedown', (e) => {
-    if (e.target.id === 'ai-modal-close') return;
+    if (e.target.id === 'tx-modal-close') return;
     
     initialX = e.clientX - xOffset;
     initialY = e.clientY - yOffset;
@@ -579,7 +579,7 @@ function createModal() {
   });
   
   // Close button
-  const closeBtn = modal.querySelector('#ai-modal-close');
+  const closeBtn = modal.querySelector('#tx-modal-close');
   closeBtn.addEventListener('mouseenter', () => {
     closeBtn.style.background = 'rgba(255,255,255,0.3)';
   });
@@ -600,10 +600,10 @@ function createModal() {
   });
   
   // Copy button
-  modal.querySelector('#ai-copy-btn').addEventListener('click', () => {
-    const content = modal.querySelector('#ai-modal-content').textContent;
+  modal.querySelector('#tx-copy-btn').addEventListener('click', () => {
+    const content = modal.querySelector('#tx-modal-content').textContent;
     navigator.clipboard.writeText(content).then(() => {
-      const btn = modal.querySelector('#ai-copy-btn');
+      const btn = modal.querySelector('#tx-copy-btn');
       const originalText = btn.textContent;
       btn.textContent = 'Kopyalandı!';
       btn.style.background = '#27ae60';
@@ -615,9 +615,9 @@ function createModal() {
   });
   
   // Language selector toggle
-  const langToggle = modal.querySelector('#ai-lang-toggle');
-  const langDropdown = modal.querySelector('#ai-lang-dropdown');
-  const langArrow = modal.querySelector('#ai-lang-arrow');
+  const langToggle = modal.querySelector('#tx-lang-toggle');
+  const langDropdown = modal.querySelector('#tx-lang-dropdown');
+  const langArrow = modal.querySelector('#tx-lang-arrow');
   let isDropdownOpen = false;
   
   langToggle.addEventListener('click', (e) => {
@@ -650,14 +650,14 @@ function createModal() {
   
   // Language option hover effects
   modal.addEventListener('mouseover', (e) => {
-    if (e.target.classList.contains('ai-lang-option')) {
+    if (e.target.classList.contains('tx-lang-option')) {
       e.target.style.background = '#f0f0f0';
       e.target.style.transform = 'translateX(4px)';
     }
   });
   
   modal.addEventListener('mouseout', (e) => {
-    if (e.target.classList.contains('ai-lang-option')) {
+    if (e.target.classList.contains('tx-lang-option')) {
       e.target.style.background = 'transparent';
       e.target.style.transform = 'translateX(0)';
     }
@@ -665,15 +665,15 @@ function createModal() {
   
   // Language selection
   modal.addEventListener('click', (e) => {
-    if (e.target.classList.contains('ai-lang-option') || e.target.parentElement?.classList.contains('ai-lang-option')) {
-      const option = e.target.classList.contains('ai-lang-option') ? e.target : e.target.parentElement;
+    if (e.target.classList.contains('tx-lang-option') || e.target.parentElement?.classList.contains('tx-lang-option')) {
+      const option = e.target.classList.contains('tx-lang-option') ? e.target : e.target.parentElement;
       const targetLang = option.getAttribute('data-lang');
       const targetFlag = option.getAttribute('data-flag');
       const targetName = option.getAttribute('data-name');
       
       // Update current language display
-      modal.querySelector('#ai-lang-flag').textContent = targetFlag;
-      modal.querySelector('#ai-lang-name').textContent = targetName;
+      modal.querySelector('#tx-lang-flag').textContent = targetFlag;
+      modal.querySelector('#tx-lang-name').textContent = targetName;
       
       // Close dropdown with animation
       isDropdownOpen = false;
@@ -684,23 +684,23 @@ function createModal() {
       
       // Translate to new language
       if (currentSourceText) {
-        processTextWithAI('translate', currentSourceText, targetLang);
+        processTextRequest('translate', currentSourceText, targetLang);
       }
     }
   });
   
-  aiModal = modal;
+  helperModal = modal;
   return modal;
 }
 
 // Modal'u göster
 function showModal(type, content = '', operation = null, currentLanguage = null) {
   const modal = createModal();
-  const loading = modal.querySelector('#ai-modal-loading');
-  const contentDiv = modal.querySelector('#ai-modal-content');
-  const errorDiv = modal.querySelector('#ai-modal-error');
-  const buttons = modal.querySelector('#ai-modal-buttons');
-  const languageSelectorHeader = modal.querySelector('#ai-language-selector-header');
+  const loading = modal.querySelector('#tx-modal-loading');
+  const contentDiv = modal.querySelector('#tx-modal-content');
+  const errorDiv = modal.querySelector('#tx-modal-error');
+  const buttons = modal.querySelector('#tx-modal-buttons');
+  const languageSelectorHeader = modal.querySelector('#tx-language-selector-header');
   
   loading.style.display = 'none';
   contentDiv.style.display = 'none';
@@ -735,8 +735,8 @@ function showModal(type, content = '', operation = null, currentLanguage = null)
         };
         
         const lang = langData[currentLanguage] || langData.en;
-        modal.querySelector('#ai-lang-flag').textContent = lang.flag;
-        modal.querySelector('#ai-lang-name').textContent = lang.name;
+        modal.querySelector('#tx-lang-flag').textContent = lang.flag;
+        modal.querySelector('#tx-lang-name').textContent = lang.name;
       }
     }
   } else if (type === 'error') {
@@ -759,7 +759,7 @@ function showModal(type, content = '', operation = null, currentLanguage = null)
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'processText') {
     console.log('Metin işleme başlatılıyor:', request.operation);
-    processTextWithAI(request.operation, request.text);
+    processTextRequest(request.operation, request.text);
     sendResponse({status: 'received'});
   }
   return true;

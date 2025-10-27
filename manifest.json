@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "AI Metin Asistanı",
+  "name": "Metin Yardımcısı",
   "version": "1.0.0",
-  "description": "Gemini AI ile metin çevirisi, düzenleme ve iyileştirme",
+  "description": "Metin çevirisi, düzenleme ve iyileştirme araçları",
   "permissions": [
     "activeTab",
     "storage",

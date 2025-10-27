@@ -1,6 +1,6 @@
-﻿# AI Metin Asistanı
+# Metin Yardımcısı
 
-Gemini AI ile metin çevirisi, düzenleme ve iyileştirme yapan Chrome eklentisi.
+Metin çevirisi, düzenleme ve iyileştirme yapan Chrome eklentisi.
 
 ## Özellikler
 

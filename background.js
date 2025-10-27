@@ -1,81 +1,66 @@
 // Background service worker
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+const SERVICE_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
 // Context menu oluştur
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('Extension yüklendi');
+  console.log('Eklenti yüklendi');
   
   // Ana menü
   chrome.contextMenus.create({
-    id: 'aiTextAssistant',
-    title: 'AI Metin Asistanı',
+    id: 'textHelper',
+    title: 'Metin Yardımcısı',
     contexts: ['selection']
   });
   
   // Alt menüler
   chrome.contextMenus.create({
     id: 'translate',
-    parentId: 'aiTextAssistant',
+    parentId: 'textHelper',
     title: 'Çevir',
     contexts: ['selection']
   });
   
   chrome.contextMenus.create({
     id: 'mailFormat',
-    parentId: 'aiTextAssistant',
+    parentId: 'textHelper',
     title: 'Mail Formatına Dönüştür',
     contexts: ['selection']
   });
   
   chrome.contextMenus.create({
     id: 'fixPunctuation',
-    parentId: 'aiTextAssistant',
+    parentId: 'textHelper',
     title: 'Noktalama ve Yazım Düzelt',
     contexts: ['selection']
   });
   
   chrome.contextMenus.create({
     id: 'expand',
-    parentId: 'aiTextAssistant',
+    parentId: 'textHelper',
     title: 'Uzat',
     contexts: ['selection']
   });
   
   chrome.contextMenus.create({
     id: 'shorten',
-    parentId: 'aiTextAssistant',
+    parentId: 'textHelper',
     title: 'Kısalt',
     contexts: ['selection']
   });
   
   chrome.contextMenus.create({
     id: 'improve',
-    parentId: 'aiTextAssistant',
+    parentId: 'textHelper',
     title: 'İyileştir',
     contexts: ['selection']
   });
 });
 
-// Context menu tıklama olayı
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.parentMenuItemId === 'aiTextAssistant' || info.menuItemId === 'aiTextAssistant') {
-    const selectedText = info.selectionText;
-    const action = info.menuItemId;
-    
-    // Content script'e mesaj gönder
-    chrome.tabs.sendMessage(tab.id, {
-      action: 'processText',
-      operation: action,
-      text: selectedText
-    });
-  }
-});
-
-// Gemini API çağrısı
-async function callGeminiAPI(prompt, apiKey) {
+// Servis API çağrısı
+async function callTextService(prompt, apiKey) {
   try {
-    console.log('Gemini API çağrısı yapılıyor...');
-    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+    console.log('Servis çağrısı yapılıyor...');
+    const response = await fetch(`${SERVICE_API_URL}?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -96,7 +81,7 @@ async function callGeminiAPI(prompt, apiKey) {
       if (response.status === 404) {
         throw new Error('API endpoint bulunamadı. Model adı veya URL yanlış olabilir.');
       } else if (response.status === 403) {
-        throw new Error('API key geçersiz veya yetkisiz. Lütfen API key\'inizi kontrol edin.');
+        throw new Error('API anahtarı geçersiz veya yetkisiz. Lütfen ayarlarınızı kontrol edin.');
       } else if (response.status === 429) {
         throw new Error('API istek limiti aşıldı. Lütfen biraz bekleyip tekrar deneyin.');
       } else {
@@ -105,7 +90,7 @@ async function callGeminiAPI(prompt, apiKey) {
     }
     
     const data = await response.json();
-    console.log('API yanıtı alındı:', data);
+    console.log('API yanıtı alındı');
     
     if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
       throw new Error('API yanıtı beklenmedik formatta.');
@@ -113,7 +98,7 @@ async function callGeminiAPI(prompt, apiKey) {
     
     return data.candidates[0].content.parts[0].text;
   } catch (error) {
-    console.error('Gemini API hatası:', error);
+    console.error('Servis hatası:', error);
     throw error;
   }
 }
@@ -150,24 +135,24 @@ function createPrompt(operation, text, targetLanguage = 'en') {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('Mesaj alındı:', request);
   
-  if (request.action === 'processWithAI') {
-    // API key'i storage'dan al
-    chrome.storage.sync.get(['geminiApiKey', 'targetLanguage'], async (result) => {
-      const apiKey = result.geminiApiKey;
+  if (request.action === 'processTextRequest') {
+    // API anahtarını storage'dan al
+    chrome.storage.sync.get(['serviceApiKey', 'targetLanguage'], async (result) => {
+      const apiKey = result.serviceApiKey;
       // Eğer request'te targetLanguage varsa onu kullan, yoksa storage'daki veya default 'en'
       const targetLanguage = request.targetLanguage || result.targetLanguage || 'en';
       
       if (!apiKey) {
-        sendResponse({ success: false, error: 'API key ayarlanmamış. Lütfen popup\'tan API key\'inizi girin.' });
+        sendResponse({ success: false, error: 'API anahtarı ayarlanmamış. Lütfen ayarlardan girin.' });
         return;
       }
       
       try {
         const prompt = createPrompt(request.operation, request.text, targetLanguage);
-        const aiResult = await callGeminiAPI(prompt, apiKey);
+        const resultText = await callTextService(prompt, apiKey);
         sendResponse({ 
           success: true, 
-          result: aiResult,
+          result: resultText,
           detectedLanguage: targetLanguage
         });
       } catch (error) {

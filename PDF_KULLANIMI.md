@@ -1,6 +1,6 @@
-# PDF Dosyalarında AI Metin Asistanı Kullanımı
+# PDF Dosyalarında Metin Yardımcısı Kullanımı
 
-Chrome'un yerleşik PDF görüntüleyicisi eklentileri desteklemez. Bu yüzden PDF dosyalarında AI Metin Asistanı'nı kullanmak için özel bir çözüm sunuyoruz.
+Chrome'un yerleşik PDF görüntüleyicisi eklentileri desteklemez. Bu yüzden PDF dosyalarında Metin Yardımcısı'nı kullanmak için özel bir çözüm sunuyoruz.
 
 ## 📖 PDF Viewer Özelliği
 
@@ -29,25 +29,25 @@ chrome-extension://abcdefghijk123456/pdf-viewer.html?file=https://example.com/do
 
 ### ⚡ PDF Viewer Özellikleri
 
-- **Metin Seçimi:** PDF'deki metinleri seçebilir ve AI Metin Asistanı'nı kullanabilirsiniz
+- **Metin Seçimi:** PDF'deki metinleri seçebilir ve Metin Yardımcısı'nı kullanabilirsiniz
 - **Sayfa Gezinme:** ◀ Önceki / Sonraki ▶ butonları
 - **Zoom:** +/- butonları ile yakınlaştırma
 - **Klavye Kısayolları:**
   - `←` `→` : Sayfa değiştir
   - `+` `-` : Zoom yap
 
-### 🎯 AI Özelliklerini Kullanma
+### 🎯 Özellikleri Kullanma
 
 PDF Viewer'da metin seçtikten sonra:
 1. Metni seçin
-2. Yüzen AI butonuna tıklayın
-3. veya **sağ tıklayıp** "AI Metin Asistanı" menüsünden işlem seçin
+2. Yüzen butona tıklayın
+3. veya **sağ tıklayıp** "Metin Yardımcısı" menüsünden işlem seçin
 
 ## 🔧 Eklenti ID'sini Bulma
 
 1. `chrome://extensions/` sayfasını açın
 2. "Geliştirici modu"nu açın
-3. AI Metin Asistanı eklentisinin altında "ID:" yazısının yanındaki kodu kopyalayın
+3. Metin Yardımcısı eklentisinin altında "ID:" yazısının yanındaki kodu kopyalayın
 
 ## 💡 İpucu
 
