@@ -48,7 +48,6 @@ Metni daha akıcı, anlaşılır ve profesyonel hale getirir
 - `icon48.png` (48x48)
 - `icon128.png` (128x128)
 
-İkon oluşturmak için https://www.favicon-generator.org/ gibi araçları kullanabilirsiniz.
 
 ## Geliştirme
 
@@ -56,6 +55,3 @@ Kod değişiklikleri yaptıktan sonra:
 1. `chrome://extensions/` sayfasında eklentinin altındaki yenile butonuna tıklayın
 2. Değişiklikleri test edin
 
-## Lisans
-
-MIT
