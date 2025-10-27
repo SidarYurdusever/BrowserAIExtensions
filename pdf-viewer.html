@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>PDF Viewer - AI Metin Asistanı</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #525659;
+      overflow: hidden;
+    }
+    
+    #toolbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: #323639;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      gap: 8px;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    #toolbar button {
+      background: #4a4d50;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    #toolbar button:hover {
+      background: #5a5d60;
+    }
+    
+    #toolbar input {
+      width: 50px;
+      padding: 4px 8px;
+      border: 1px solid #4a4d50;
+      border-radius: 4px;
+      background: #2a2d30;
+      color: white;
+      text-align: center;
+    }
+    
+    #toolbar span {
+      color: #bbb;
+      font-size: 14px;
+    }
+    
+    #pdf-container {
+      position: absolute;
+      top: 40px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: auto;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    #pdf-canvas {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      margin: 0 auto;
+      display: block;
+      background: white;
+    }
+    
+    .loading {
+      color: white;
+      font-size: 18px;
+      margin-top: 100px;
+    }
+  </style>
+</head>
+<body>
+  <div id="toolbar">
+    <button id="prev-page">◀ Önceki</button>
+    <span>Sayfa: </span>
+    <input type="number" id="page-num" value="1" min="1">
+    <span id="page-count">/ 1</span>
+    <button id="next-page">Sonraki ▶</button>
+    <button id="zoom-out">-</button>
+    <span id="zoom-level">100%</span>
+    <button id="zoom-in">+</button>
+  </div>
+  
+  <div id="pdf-container">
+    <div class="loading">PDF yükleniyor...</div>
+    <canvas id="pdf-canvas"></canvas>
+  </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="pdf-viewer.js"></script>
+  <script src="content.js"></script>
+</body>
+</html>

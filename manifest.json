@@ -1,11 +1,16 @@
 {
   "manifest_version": 3,
-  "name": "Chrome Extension",
+  "name": "AI Metin Asistanı",
   "version": "1.0.0",
-  "description": "A Chrome extension",
+  "description": "Gemini AI ile metin çevirisi, düzenleme ve iyileştirme",
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "https://generativelanguage.googleapis.com/*",
+    "<all_urls>"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -23,10 +28,23 @@
   "background": {
     "service_worker": "background.js"
   },
+  "web_accessible_resources": [
+    {
+      "resources": ["pdf-viewer.html", "pdf-viewer.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "js": ["content.js"],
+      "all_frames": true,
+      "match_about_blank": true
+    },
+    {
+      "matches": ["file:///*"],
+      "js": ["content.js"],
+      "all_frames": true
     }
   ]
 }

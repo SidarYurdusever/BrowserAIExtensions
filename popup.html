@@ -3,14 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chrome Extension</title>
+  <title>AI Metin Asistanı</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div class="container">
-    <h1>Chrome Extension</h1>
-    <p>Hoş geldiniz!</p>
-    <button id="actionButton">Tıkla</button>
+    <h1>AI Metin Asistanı</h1>
+    <p class="subtitle">Gemini Flash ile metin işleme</p>
+    
+    <div class="section">
+      <label for="apiKey">Gemini API Key:</label>
+      <div class="input-group">
+        <input type="password" id="apiKey" placeholder="API key\'inizi girin">
+        <button id="toggleApiKey" class="icon-btn" title="Göster/Gizle">👁️</button>
+      </div>
+      <small class="help-text">
+        <a href="https://aistudio.google.com/app/apikey" target="_blank">API key alın</a>
+      </small>
+    </div>
+    
+    <div class="section">
+      <label for="targetLanguage">Çeviri Hedef Dili:</label>
+      <select id="targetLanguage">
+        <option value="en">İngilizce</option>
+        <option value="tr" selected>Türkçe</option>
+      </select>
+    </div>
+    
+    <button id="saveSettings" class="primary-btn">Ayarları Kaydet</button>
+    
+    <div id="status" class="status"></div>
+    
+    <div class="info-box">
+      <h3>Kullanım:</h3>
+      <ol>
+        <li>Herhangi bir web sayfasında metin seçin</li>
+        <li>Sağ tıklayıp "AI Metin Asistanı" menüsünden istediğiniz işlemi seçin</li>
+        <li>AI sonucunu görüntüleyin ve kopyalayın</li>
+      </ol>
+      
+      <h4>İşlemler:</h4>
+      <ul>
+        <li><strong>Çevir:</strong> Metni seçili dile çevirir</li>
+        <li><strong>Mail Formatı:</strong> E-posta formatına dönüştürür</li>
+        <li><strong>Noktalama Düzelt:</strong> Yazım hatalarını düzeltir</li>
+        <li><strong>Uzat:</strong> Metni detaylandırır</li>
+        <li><strong>Kısalt:</strong> Metni özetler</li>
+        <li><strong>İyileştir:</strong> Daha profesyonel hale getirir</li>
+      </ul>
+    </div>
   </div>
   <script src="popup.js"></script>
 </body>

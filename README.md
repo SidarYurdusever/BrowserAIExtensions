@@ -1,6 +1,28 @@
-# Chrome Extension
+﻿# AI Metin Asistanı
 
-Bir Chrome tarayıcı eklentisi.
+Gemini AI ile metin çevirisi, düzenleme ve iyileştirme yapan Chrome eklentisi.
+
+## Özellikler
+
+### 🌐 Metin Çevirisi
+Seçili metni hedef dile çevirir
+- 10 dil arasında geçiş: Türkçe, İngilizce, İspanyolca, Fransızca, Almanca, İtalyanca, Portekizce, Rusça, Kürtçe, Zazaca
+- Çeviri sonrası diller arasında anlık geçiş
+
+### 📧 Mail Formatı
+Metni profesyonel e-posta formatına dönüştür (konu, selamlama, imza)
+
+### ✍️ Noktalama ve Yazım Düzeltme
+Yazım hatalarını ve noktalama işaretlerini otomatik düzeltir
+
+### 📝 Metin Uzatma
+Metni daha detaylı ve kapsamlı hale getirir
+
+### 📄 Metin Kısaltma
+Metni özetleyerek kısa ve öz hale getirir
+
+### ⭐ Metin İyileştirme
+Metni daha akıcı, anlaşılır ve profesyonel hale getirir
 
 ## Kurulum
 
@@ -26,7 +48,7 @@ Bir Chrome tarayıcı eklentisi.
 - `icon48.png` (48x48)
 - `icon128.png` (128x128)
 
-İkon oluşturmak için [https://www.favicon-generator.org/](https://www.favicon-generator.org/) gibi araçları kullanabilirsiniz.
+İkon oluşturmak için https://www.favicon-generator.org/ gibi araçları kullanabilirsiniz.
 
 ## Geliştirme
 
